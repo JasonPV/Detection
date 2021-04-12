@@ -1,6 +1,7 @@
 import sys
 import template_matching
 import ViolaJones
+import symmetryLines
 from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore    import *
@@ -16,9 +17,11 @@ class mainWindow(QWidget):
         self.btn_t = QPushButton('Choose files')
         self.btn_t.clicked.connect(self.on_click_t)
 
-        # Обработка сигнала через лямбду
         self.button_v = QPushButton('Choose file')
         self.button_v.clicked.connect(self.on_click_v)
+
+        self.button_s = QPushButton('Choose file')
+        self.button_s.clicked.connect(self.on_click_s)
 
         self.label = QLabel(self)
         self.tab_1 = QFrame()
@@ -34,21 +37,23 @@ class mainWindow(QWidget):
         # self.layout_tab_2.addStretch(1)
         self.tab_2.setLayout(self.layout_tab_2)
 
-        tab_3 = QFrame()
-        layout_tab_3 = QVBoxLayout()
-        # layout_tab_3.addWidget(self.button_prev, alignment=Qt.AlignBottom)
-        tab_3.setLayout(layout_tab_3)
+        self.label3 = QLabel(self)
+        self.tab_3 = QFrame()
+        self.layout_tab_3 = QVBoxLayout()
+        self.layout_tab_3.addWidget(self.button_s, alignment=Qt.AlignTop)
+        self.tab_3.setLayout(self.layout_tab_3)
 
         self.tab = QTabWidget()
         self.tab.addTab(self.tab_1, "Template matching")
         self.tab.addTab(self.tab_2, "Viola-Jones")
-        self.tab.addTab(tab_3, "SymmetryLines")
+        self.tab.addTab(self.tab_3, "SymmetryLines")
 
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.tab)
         self.setLayout(main_layout)
 
-        self.setWindowState(Qt.WindowMaximized)
+        # self.setWindowState(Qt.WindowMaximized)
+        self.setGeometry(100, 100, 1000, 650)
         self.setWindowTitle('Detection')
         self.show()
 
@@ -83,9 +88,25 @@ class mainWindow(QWidget):
         self.layout_tab_2.addWidget(self.label2, alignment=Qt.AlignCenter | Qt.AlignTop)
         self.tab_2.setLayout(self.layout_tab_2)
 
+    def on_click_s(self):
+        file = QFileDialog.getOpenFileName(self, 'Choose image', None, 'Images (*.png *.xpm *.jpg)')[0]
+        self.label3.clear()
+        image = symmetryLines.symmetryLines(file)
+        height, width, channel = image.shape
+        bytesPerLine = 3 * width
+        image = QImage(image.data, width, height, bytesPerLine, QImage.Format_RGB888)
+        image = QImage.rgbSwapped(image)
+        pixmap = QPixmap.fromImage(image)
+        self.label3.setPixmap(pixmap)
+        self.label3.resize(pixmap.width(), pixmap.height())
+        self.resize(pixmap.width(), pixmap.height())
+        self.layout_tab_3.addWidget(self.label3, alignment=Qt.AlignCenter | Qt.AlignTop)
+        self.tab_3.setLayout(self.layout_tab_3)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = mainWindow()
+    ex.setFixedSize(ex.size())
     ex.show()
     sys.exit(app.exec_())

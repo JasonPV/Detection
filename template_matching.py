@@ -1,12 +1,9 @@
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
+import imutils
 
 
 def template_matching(path1, path2):
-    import cv2
-    import numpy as np
-    from matplotlib import pyplot as plt
 
     img_rgb = cv2.imread(path1)
     img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
@@ -18,15 +15,16 @@ def template_matching(path1, path2):
     loc = np.where(res >= threshold)
     for pt in zip(*loc[::-1]):
         cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+    img_rgb = imutils.resize(img_rgb, width=350)
 
     # cv2.imwrite('res.png', img_rgb)
-    return img_rgb
     # cv2.imshow("Matched image", img_rgb)
     # while True:
     #     k = cv2.waitKey(0) & 0xFF
     #     if k == 27:
     #         cv2.destroyAllWindows()
     #         break
+    return img_rgb
 
 
 if __name__ == '__main__':

@@ -5,12 +5,14 @@ from cv2 import waitKey
 from cv2 import destroyAllWindows
 from cv2 import CascadeClassifier
 from cv2 import rectangle
+import imutils
 import matplotlib.pyplot as plt
 
 
 def viola_jones(path):
     # load the photograph
     pixels = imread(path)
+    pixels = imutils.resize(pixels, width=350)
     # load the pre-trained model
     classifier = CascadeClassifier('haarcascade_frontalface_default.xml')
     # perform face detection
